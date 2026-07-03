@@ -1,15 +1,15 @@
 :root {
-  --bg: #050816;
-  --panel: rgba(10, 16, 30, 0.72);
-  --panel-strong: rgba(9, 14, 26, 0.92);
+  --bg: #0b1020;
+  --panel: rgba(17, 22, 34, 0.78);
+  --panel-strong: rgba(13, 18, 28, 0.95);
   --text: #f5f7ff;
   --muted: rgba(230, 236, 255, 0.68);
   --line: rgba(153, 198, 255, 0.18);
-  --accent: #7cf6ff;
-  --accent2: #b46bff;
+  --accent: #8fd9d6;
+  --accent2: #9aa7ff;
   --danger: #ff5f7e;
   --good: #6dff9e;
-  --shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+  --shadow: 0 18px 42px rgba(0, 0, 0, 0.42);
   --radius: 22px;
 }
 
@@ -20,10 +20,10 @@ html, body {
   height: 100%;
   overflow: hidden;
   background:
-    radial-gradient(circle at 20% 20%, rgba(124,246,255,0.12), transparent 30%),
-    radial-gradient(circle at 80% 20%, rgba(180,107,255,0.12), transparent 28%),
-    radial-gradient(circle at 50% 80%, rgba(109,255,158,0.08), transparent 28%),
-    linear-gradient(180deg, #04060f 0%, #080c18 55%, #04050b 100%);
+    radial-gradient(circle at 20% 20%, rgba(143,217,214,0.08), transparent 30%),
+    radial-gradient(circle at 80% 20%, rgba(154,167,255,0.08), transparent 28%),
+    radial-gradient(circle at 50% 80%, rgba(255,201,140,0.05), transparent 28%),
+    linear-gradient(180deg, #080d18 0%, #0b111e 55%, #070b14 100%);
   color: var(--text);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
 }
@@ -32,7 +32,7 @@ body::before {
   position: fixed; inset: 0;
   background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
   background-size: 48px 48px;
-  opacity: 0.08;
+  opacity: 0.04;
   pointer-events: none;
   mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
 }
@@ -45,7 +45,7 @@ canvas#game { position: absolute; inset: 0; width: 100%; height: 100%; display: 
   inset: 0;
   display: grid;
   place-items: center;
-  background: radial-gradient(circle at center, rgba(3,6,16,0.30), rgba(3,6,16,0.86));
+  background: radial-gradient(circle at center, rgba(4,8,18,0.26), rgba(4,8,18,0.82));
   backdrop-filter: blur(8px);
   opacity: 0;
   transform: scale(1.01);
@@ -57,9 +57,9 @@ canvas#game { position: absolute; inset: 0; width: 100%; height: 100%; display: 
   max-height: min(92vh, 980px);
   overflow: auto;
   padding: 28px;
-  border: 1px solid rgba(155, 195, 255, 0.18);
+  border: 1px solid rgba(190, 202, 228, 0.12);
   border-radius: 28px;
-  background: linear-gradient(180deg, rgba(13,18,32,0.88), rgba(6,10,20,0.74));
+  background: linear-gradient(180deg, rgba(18,23,35,0.92), rgba(10,14,24,0.82));
   box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,0.04);
   position: relative;
 }
@@ -119,10 +119,10 @@ h2 { font-size: clamp(30px, 4vw, 50px); }
   box-shadow: 0 8px 24px rgba(0,0,0,0.26);
   transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease, filter 160ms ease;
 }
-.btn:hover, .btn:focus-visible { transform: translateY(-2px); border-color: rgba(124, 246, 255, 0.5); box-shadow: 0 12px 28px rgba(0,0,0,0.32); outline: none; }
+.btn:hover, .btn:focus-visible { transform: translateY(-2px); border-color: rgba(143, 217, 214, 0.34); box-shadow: 0 12px 28px rgba(0,0,0,0.32); outline: none; }
 .btn:active { transform: translateY(1px) scale(0.99); }
 .btn--primary {
-  background: linear-gradient(180deg, rgba(124,246,255,0.95), rgba(78,171,255,0.72));
+  background: linear-gradient(180deg, rgba(143,217,214,0.95), rgba(114,138,255,0.72));
   color: #03111b;
   border-color: rgba(255,255,255,0.24);
 }
