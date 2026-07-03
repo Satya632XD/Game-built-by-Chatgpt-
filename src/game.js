@@ -331,7 +331,11 @@
     hideTouch(hide = true) { this.ui.touchControls.classList.toggle('hidden', hide); }
 
     persist() {
-      try { this.persist(); } catch { /* ignore storage errors */ }
+      try {
+        this.save.write(this.perm);
+      } catch {
+        /* ignore storage errors */
+      }
     }
 
     updateMenuStats() {
@@ -508,7 +512,7 @@
     }
 
     banner(title, desc, color) {
-      this.bannerText = `${title} — ${desc}`;
+      this.bannerText = `${title} â€” ${desc}`;
       this.bannerTimer = 3.8;
       this.bannerColor = color;
       this.ui.eventBanner.textContent = this.bannerText;
