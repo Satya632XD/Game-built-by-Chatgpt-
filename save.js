@@ -19,14 +19,26 @@
     equipped: 'starterShield',
   };
 
+  function read(key) {
+    try { return localStorage.getItem(key); } catch { return null; }
+  }
+
+  function writeStorage(key, value) {
+    try { localStorage.setItem(key, value); } catch { /* storage can be unavailable */ }
+  }
+
+  function removeStorage(key) {
+    try { localStorage.removeItem(key); } catch { /* ignore */ }
+  }
+
   function load() {
     try {
-      const data = JSON.parse(localStorage.getItem(storageKey) || '{}');
+      const data = JSON.parse(read(storageKey) || '{}');
       const save = structuredClone(defaults);
       Object.assign(save, data);
       save.unlocked = Object.assign(structuredClone(defaults.unlocked), data.unlocked || {});
-      save.audioEnabled = localStorage.getItem(audioKey);
-      save.audioEnabled = save.audioEnabled == null ? defaults.audioEnabled : save.audioEnabled === 'true';
+      const audio = read(audioKey);
+      save.audioEnabled = audio == null ? defaults.audioEnabled : audio === 'true';
       if (!save.unlocked[save.equipped]) save.equipped = 'starterShield';
       return save;
     } catch {
@@ -35,7 +47,7 @@
   }
 
   function write(save) {
-    localStorage.setItem(storageKey, JSON.stringify({
+    writeStorage(storageKey, JSON.stringify({
       bestScore: save.bestScore,
       bestWave: save.bestWave,
       bossClears: save.bossClears,
@@ -45,12 +57,12 @@
       unlocked: save.unlocked,
       equipped: save.equipped,
     }));
-    localStorage.setItem(audioKey, String(save.audioEnabled));
+    writeStorage(audioKey, String(save.audioEnabled));
   }
 
   function reset() {
-    localStorage.removeItem(storageKey);
-    localStorage.removeItem(audioKey);
+    removeStorage(storageKey);
+    removeStorage(audioKey);
   }
 
   window.NRC_SAVE = { load, write, reset, defaults };
