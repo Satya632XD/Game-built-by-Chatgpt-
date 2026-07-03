@@ -8,3 +8,4 @@ Controls:
 - Pause: Esc or P
 
 Progress saves in localStorage.
+[README.md](https://github.com/user-attachments/files/29641377/README.md)
