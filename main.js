@@ -53,6 +53,11 @@
   if (!save.audioEnabled) audio.setEnabled(false);
   game.goMenu();
 
+  const launch = () => { void game.startRun().catch(() => {}); };
+  const launchContinue = () => { void game.startRun(true).catch(() => {}); };
+  ui.btnStart.addEventListener('pointerdown', e => { e.preventDefault(); launch(); }, { passive: false });
+  ui.btnContinue.addEventListener('pointerdown', e => { e.preventDefault(); launchContinue(); }, { passive: false });
+
   const isTouch = window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0;
   ui.touchControls.classList.toggle('hidden', !isTouch);
 
