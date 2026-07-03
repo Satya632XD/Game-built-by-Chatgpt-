@@ -41,60 +41,85 @@
     dashButton: document.getElementById('dashButton'),
   };
 
-  const save = window.NRC_SAVE.load();
-  const audio = new window.NRC_AudioEngine();
-  audio.setEnabled(save.audioEnabled);
-  const input = new window.NRC_InputManager(canvas);
-  const game = new window.NRC_Game(canvas, ui, audio, window.NRC_SAVE, input);
-
-  game.perm = save;
-  game.renderPermMenu();
-  game.updateMenuStats();
-  game.goMenu();
-
-  const launch = () => { void game.startRun().catch(err => console.error(err)); };
-  const launchContinue = () => { void game.startRun(true).catch(err => console.error(err)); };
-
-  ui.btnStart.addEventListener('click', launch);
-  ui.btnContinue.addEventListener('click', launchContinue);
-  ui.btnStart.addEventListener('pointerdown', e => { e.preventDefault(); launch(); }, { passive: false });
-  ui.btnContinue.addEventListener('pointerdown', e => { e.preventDefault(); launchContinue(); }, { passive: false });
-
-  const isTouch = window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0;
-  ui.touchControls.classList.toggle('hidden', !isTouch);
-
-  let last = performance.now();
-  function frame(now) {
-    const dt = Math.min(0.033, (now - last) / 1000);
-    last = now;
-
+  const safe = (fn) => {
     try {
-      if (input.wantsPause()) game.togglePause();
-      game.update(dt);
+      return fn();
     } catch (err) {
-      console.error('Game loop error:', err);
-      game.state = 'menu';
-      game.running = false;
-      game.goMenu();
+      console.error(err);
+      return null;
+    }
+  };
+
+  let game = null;
+  let input = null;
+
+  function bindLaunchButtons() {
+    const launch = (continueLast = false) => {
+      if (!game) return;
+      void game.startRun(continueLast).catch(err => console.error(err));
+    };
+
+    ui.btnStart.addEventListener('click', () => launch(false));
+    ui.btnContinue.addEventListener('click', () => launch(true));
+    ui.btnRestart.addEventListener('click', () => launch(false));
+    ui.btnRestartPause.addEventListener('click', () => launch(false));
+
+    ui.btnStart.addEventListener('pointerdown', e => { e.preventDefault(); launch(false); }, { passive: false });
+    ui.btnContinue.addEventListener('pointerdown', e => { e.preventDefault(); launch(true); }, { passive: false });
+    ui.btnRestart.addEventListener('pointerdown', e => { e.preventDefault(); launch(false); }, { passive: false });
+    ui.btnRestartPause.addEventListener('pointerdown', e => { e.preventDefault(); launch(false); }, { passive: false });
+  }
+
+  function startLoop() {
+    let last = performance.now();
+
+    function frame(now) {
+      const dt = Math.min(0.033, (now - last) / 1000);
+      last = now;
+
+      if (game) {
+        try {
+          if (input && input.wantsPause()) game.togglePause();
+          game.update(dt);
+        } catch (err) {
+          console.error('Game loop error:', err);
+          try {
+            game.goMenu();
+          } catch {}
+        }
+      }
+
+      if (input) input.tick();
+      requestAnimationFrame(frame);
     }
 
-    input.tick();
     requestAnimationFrame(frame);
   }
-  requestAnimationFrame(frame);
 
-  const updateStickVisual = () => {
-    if (!input.touchMove.active) {
-      ui.stickKnob.style.transform = 'translate(0px, 0px)';
-      return;
-    }
-    const dx = input.touchMove.dx;
-    const dy = input.touchMove.dy;
-    const max = 42;
-    const l = Math.hypot(dx, dy) || 1;
-    const x = Math.max(-max, Math.min(max, dx / l * Math.min(max, l)));
-    const y = Math.max(-max, Math.min(max, dy / l * Math.min(max, l)));
-    ui.stickKnob.style.transform = `translate(${x}px, ${y}px)`;
-  };
-  setInterval(updateStickVisual, 16);
+  function init() {
+    safe(() => {
+      const save = window.NRC_SAVE.load();
+      const audio = new window.NRC_AudioEngine();
+      audio.setEnabled(save.audioEnabled);
+      input = new window.NRC_InputManager(canvas);
+      game = new window.NRC_Game(canvas, ui, audio, window.NRC_SAVE, input);
+
+      game.perm = save;
+      game.renderPermMenu();
+      game.updateMenuStats();
+      game.goMenu();
+
+      bindLaunchButtons();
+
+      const isTouch = window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0;
+      ui.touchControls.classList.toggle('hidden', !isTouch);
+    });
+
+    startLoop();
+  }
+
+  // Wait one animation frame so layout is settled before measuring the canvas.
+  requestAnimationFrame(() => {
+    requestAnimationFrame(init);
+  });
 })();
