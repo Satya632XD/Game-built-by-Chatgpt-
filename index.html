@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Neon Rift Courier</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <canvas id="game"></canvas>
+
+    <div id="overlay" class="screen screen--visible">
+      <div class="panel panel--hero">
+        <div class="eyebrow">ARCADE ROGUELITE · PROCEDURAL RUNS</div>
+        <h1>Neon Rift Courier</h1>
+        <p class="lead">Harvest shards, outrun the rift, draft upgrades, and face the sector boss. Every run is different. Every dodge matters.</p>
+
+        <div class="menu-row">
+          <button id="btnStart" class="btn btn--primary">Start Run</button>
+          <button id="btnContinue" class="btn">Continue</button>
+        </div>
+
+        <div class="menu-grid">
+          <div class="stat-card"><span>Best Score</span><strong id="bestScore">0</strong></div>
+          <div class="stat-card"><span>Total Sparks</span><strong id="sparkCount">0</strong></div>
+          <div class="stat-card"><span>Bests</span><strong id="bestWave">Wave 0</strong></div>
+          <div class="stat-card"><span>Boss Clears</span><strong id="bossClears">0</strong></div>
+        </div>
+
+        <div class="unlock-panel">
+          <div class="section-title">Permanent Upgrades</div>
+          <div id="permUpgrades" class="upgrade-list"></div>
+        </div>
+
+        <div class="section-title">How to Play</div>
+        <ul class="instructions">
+          <li>Move with WASD / Arrow Keys or drag on touch.</li>
+          <li>The ship auto-fires at nearby threats.</li>
+          <li>Dash with Space / Shift / tap the dash button.</li>
+          <li>Collect shards to keep momentum and raise your multiplier.</li>
+          <li>Draft one of three random upgrades after each sector.</li>
+        </ul>
+
+        <div class="menu-row menu-row--small">
+          <button id="btnAudio" class="btn btn--ghost">Audio: On</button>
+          <button id="btnResetSave" class="btn btn--ghost">Reset Save</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="hud" class="hud hidden">
+      <div class="hud-top">
+        <div class="hud-pill"><span>Score</span><strong id="hudScore">0</strong></div>
+        <div class="hud-pill"><span>Wave</span><strong id="hudWave">1</strong></div>
+        <div class="hud-pill"><span>Charge</span><strong id="hudCharge">0%</strong></div>
+        <div class="hud-pill"><span>Combo</span><strong id="hudCombo">x1.0</strong></div>
+        <div class="hud-pill"><span>HP</span><strong id="hudHp">100</strong></div>
+      </div>
+      <div class="bars">
+        <div class="bar"><div id="hpBar" class="bar__fill"></div></div>
+        <div class="bar bar--alt"><div id="dashBar" class="bar__fill"></div></div>
+      </div>
+      <div id="eventBanner" class="banner"></div>
+    </div>
+
+    <div id="pauseScreen" class="screen hidden">
+      <div class="panel panel--modal">
+        <h2>Paused</h2>
+        <p>Take a breath. The rift is not waiting, but it is predictable enough to exploit.</p>
+        <div class="menu-row">
+          <button id="btnResume" class="btn btn--primary">Resume</button>
+          <button id="btnRestartPause" class="btn">Restart</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="upgradeScreen" class="screen hidden">
+      <div class="panel panel--modal panel--upgrade">
+        <h2>Sector Draft</h2>
+        <p>Choose one permanent run upgrade.</p>
+        <div id="upgradeChoices" class="choice-grid"></div>
+      </div>
+    </div>
+
+    <div id="gameOverScreen" class="screen hidden">
+      <div class="panel panel--modal">
+        <div id="resultBadge" class="eyebrow">RUN ENDED</div>
+        <h2 id="resultTitle">Game Over</h2>
+        <p id="resultText">The rift closed around your hull.</p>
+        <div class="menu-grid menu-grid--compact">
+          <div class="stat-card"><span>Score</span><strong id="finalScore">0</strong></div>
+          <div class="stat-card"><span>Wave</span><strong id="finalWave">0</strong></div>
+          <div class="stat-card"><span>Enemies</span><strong id="finalKills">0</strong></div>
+          <div class="stat-card"><span>Sparks Earned</span><strong id="finalSparks">0</strong></div>
+        </div>
+        <div class="menu-row">
+          <button id="btnRestart" class="btn btn--primary">Run Again</button>
+          <button id="btnMenu" class="btn">Main Menu</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="touchControls" class="touch-controls hidden">
+      <div id="stickBase" class="stick-base"><div id="stickKnob" class="stick-knob"></div></div>
+      <button id="dashButton" class="dash-button">Dash</button>
+    </div>
+  </div>
+
+  <script src="src/config.js"></script>
+  <script src="src/util.js"></script>
+  <script src="src/save.js"></script>
+  <script src="src/input.js"></script>
+  <script src="src/audio.js"></script>
+  <script src="src/game.js"></script>
+  <script src="src/main.js"></script>
+</body>
+</html>
