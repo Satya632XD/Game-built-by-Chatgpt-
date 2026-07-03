@@ -50,11 +50,13 @@
   game.perm = save;
   game.renderPermMenu();
   game.updateMenuStats();
-  if (!save.audioEnabled) audio.setEnabled(false);
   game.goMenu();
 
-  const launch = () => { void game.startRun().catch(() => {}); };
-  const launchContinue = () => { void game.startRun(true).catch(() => {}); };
+  const launch = () => { void game.startRun().catch(err => console.error(err)); };
+  const launchContinue = () => { void game.startRun(true).catch(err => console.error(err)); };
+
+  ui.btnStart.addEventListener('click', launch);
+  ui.btnContinue.addEventListener('click', launchContinue);
   ui.btnStart.addEventListener('pointerdown', e => { e.preventDefault(); launch(); }, { passive: false });
   ui.btnContinue.addEventListener('pointerdown', e => { e.preventDefault(); launchContinue(); }, { passive: false });
 
@@ -65,14 +67,22 @@
   function frame(now) {
     const dt = Math.min(0.033, (now - last) / 1000);
     last = now;
-    if (input.wantsPause()) game.togglePause();
-    game.update(dt);
+
+    try {
+      if (input.wantsPause()) game.togglePause();
+      game.update(dt);
+    } catch (err) {
+      console.error('Game loop error:', err);
+      game.state = 'menu';
+      game.running = false;
+      game.goMenu();
+    }
+
     input.tick();
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
 
-  // Touch joystick visuals
   const updateStickVisual = () => {
     if (!input.touchMove.active) {
       ui.stickKnob.style.transform = 'translate(0px, 0px)';
@@ -87,8 +97,4 @@
     ui.stickKnob.style.transform = `translate(${x}px, ${y}px)`;
   };
   setInterval(updateStickVisual, 16);
-
-  // Build menu cards now that save is loaded
-  game.renderPermMenu();
-  game.updateMenuStats();
 })();
