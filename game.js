@@ -258,17 +258,20 @@
     }
 
     bindUI() {
-      this.ui.btnStart.addEventListener('click', async () => { await this.startRun(); });
-      this.ui.btnContinue.addEventListener('click', async () => { await this.startRun(true); });
-      this.ui.btnRestart.addEventListener('click', async () => { await this.startRun(); });
-      this.ui.btnRestartPause.addEventListener('click', async () => { await this.startRun(); });
+      const launch = (cont = false) => { void this.startRun(cont).catch(() => {}); };
+      this.ui.btnStart.addEventListener('click', () => launch());
+      this.ui.btnContinue.addEventListener('click', () => launch(true));
+      this.ui.btnRestart.addEventListener('click', () => launch());
+      this.ui.btnRestartPause.addEventListener('click', () => launch());
+      this.ui.btnStart.addEventListener('pointerdown', e => { e.preventDefault(); launch(); }, { passive: false });
+      this.ui.btnContinue.addEventListener('pointerdown', e => { e.preventDefault(); launch(true); }, { passive: false });
       this.ui.btnMenu.addEventListener('click', () => this.goMenu());
       this.ui.btnResume.addEventListener('click', () => this.resume());
       this.ui.btnAudio.addEventListener('click', async () => {
         this.perm.audioEnabled = !this.perm.audioEnabled;
         this.audio.setEnabled(this.perm.audioEnabled);
-        await this.audio.init(this.perm.audioEnabled);
-        this.save.write(this.perm);
+        try { await this.audio.init(this.perm.audioEnabled); } catch { /* continue silently */ }
+        this.persist();
         this.ui.btnAudio.textContent = `Audio: ${this.perm.audioEnabled ? 'On' : 'Off'}`;
       });
       this.ui.btnResetSave.addEventListener('click', () => {
@@ -327,6 +330,10 @@
     hide(el) { el.classList.add('hidden'); el.classList.remove('screen--visible'); }
     hideTouch(hide = true) { this.ui.touchControls.classList.toggle('hidden', hide); }
 
+    persist() {
+      try { this.persist(); } catch { /* ignore storage errors */ }
+    }
+
     updateMenuStats() {
       this.ui.bestScore.textContent = String(this.perm.bestScore || 0);
       this.ui.sparkCount.textContent = String(this.perm.sparks || 0);
@@ -367,14 +374,13 @@
       this.perm.sparks -= up.cost;
       this.perm.unlocked[id] = true;
       this.perm.equipped = id;
-      this.save.write(this.perm);
+      this.persist();
       this.renderPermMenu();
       this.updateMenuStats();
       this.audio.upgrade();
     }
 
     async startRun(continueLast = false) {
-      await this.audio.init(this.perm.audioEnabled);
       this.running = true;
       this.state = 'playing';
       this.stateTime = 0;
@@ -422,7 +428,9 @@
       this.ui.hud.classList.remove('hidden');
       this.hideTouch(!this.input.usingTouch);
       this.perm.runs = (this.perm.runs || 0) + 1;
-      this.save.write(this.perm);
+      this.persist();
+
+      try { void this.audio.init(this.perm.audioEnabled).catch(() => {}); } catch { /* audio is optional */ }
       this.audio.tone({ freq: 246, type: 'triangle', dur: 0.12, gain: 0.05 });
       this.audio.tone({ freq: 369.99, type: 'triangle', dur: 0.12, gain: 0.03 });
     }
@@ -989,7 +997,7 @@
       this.spawnRadialBurst(p.x, p.y, 9, 'rgba(109,255,158,0.95)');
       this.audio.collect();
       this.camera.shake = Math.min(6, this.camera.shake + 1.1);
-      this.save.write(this.perm);
+      this.persist();
     }
 
     updateParticles(dt) {
@@ -1074,7 +1082,7 @@
       if (Math.random() < this.pickupChance + this.wave * 0.01) this.spawnPickupAt(e.x + U.rand(-16, 16), e.y + U.rand(-16, 16));
       if (this.enemies.length < C.maxEnemies && Math.random() < 0.5) this.spawnEnemy();
       this.audio.hit();
-      this.save.write(this.perm);
+      this.persist();
     }
 
     spawnSplitEnemies(x, y) {
@@ -1118,7 +1126,7 @@
       this.perm.bestWave = Math.max(this.perm.bestWave || 0, this.wave);
       if (win) this.perm.bossClears = (this.perm.bossClears || 0) + 1;
       this.perm.sparks = (this.perm.sparks || 0) + Math.max(0, Math.floor(this.score / 350));
-      this.save.write(this.perm);
+      this.persist();
       this.showGameOver(win);
       if (win) this.audio.win(); else this.audio.lose();
     }
